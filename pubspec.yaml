@@ -1,0 +1,5 @@
+name: 'ThogaKade_CLI'
+environment:
+  sdk: ^3.5.0
+dependencies:
+  sqlite3: ^2.5.0
