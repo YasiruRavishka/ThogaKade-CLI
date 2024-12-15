@@ -1,6 +1,8 @@
+import './CartItem.dart';
+
 class Order {
   int? id;
-  List<Map<int, int>> items; // Map of [VegetableID , Quantity]
+  List<CartItem> items; // Map of [VegetableID , Quantity]
   double total;
   DateTime timestamp;
 
@@ -14,7 +16,7 @@ class Order {
   factory Order.fromJson(Map<String, dynamic> fromJson) {
     return Order(
         id: fromJson['id'] as int,
-        items: fromJson['items'] as List<Map<int, int>>,
+        items: fromJson['items'] as List<CartItem>,
         total: fromJson['total'] as double,
         timestamp: DateTime.parse(fromJson['timestamp'] as String));
   }
