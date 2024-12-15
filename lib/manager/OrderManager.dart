@@ -1,50 +1,53 @@
 import 'dart:io';
 
-import '../manager/ThogaKadeManager.dart';
 import '../model/Order.dart';
-import '../repository/OrderDao.dart';
+import '../model/CartItem.dart';
+import '../repository/AppRepository.dart';
 
 class OrderManager {
-
-  void checkout(List<Map<String, int>> cart) {
-    if (cart.isEmpty) {
-      print("Empty cart.");
-      sleep(Duration(seconds: 2));
-      return;
-    }
-    print("=" * 10);
-    print(" Checkout ");
-    print("=" * 10);
+  bool addToCart(int itemId, int itemQty) {
     try {
-      ThogaKadeManager().viewCart();
-
-      stdout.write("Do you want to continue (y/n) - ");
-      switch(stdin.readLineSync()!.toLowerCase()) {
-        case 'y':
-          OrderDao().placedOrder(cart);
-          break;
-        case 'n':
-          break;
-        default:
-          throw Exception();
-      }
+      AppRepository()
+          .addToCart(CartItem.fromJson({'item_id': itemId, 'item_qty': itemQty}));
+      return true;
     } catch (e) {
-      print("Invalid argument.\nPlease, try again.");
-      sleep(Duration(seconds: 3));
+      print("Error!, addToCart()");
     }
+    return false;
   }
 
-  void viewPreviousOrders() {
-    print("=" * 22);
-    print(" View previous orders ");
-    print("=" * 22);
+  List<CartItem>? getAllCart() {
+    return AppRepository().getCart();
+  }
+
+  bool checkout() {
     try {
-      for(final ord in OrderDao().getAll() ) {
-        print(ord.toJson());
+      final List<CartItem> _cart = AppRepository().getCart()!;
+      if (_cart.isEmpty) {
+        throw Exception("Empty cart.");
       }
+      double _total = 0;
+      for (final val in _cart) {
+        _total += AppRepository().searchVegetableById(val.itemId)!.pricePerKg *
+            val.itemQty;
+      }
+      AppRepository().placedOrder(
+          Order(items: _cart, total: _total, timestamp: DateTime.now()));
+      return true;
     } catch (e) {
-      print("Can not load data from database");
+      print("Invalid!, $e.\nPlease, try again.");
       sleep(Duration(seconds: 3));
     }
+    return false;
+  }
+
+  List<Order>? getAllPreviousOrders() {
+    try {
+      return AppRepository().getAllOrder()!;
+    } catch (e) {
+      print("Can't load data from database");
+      sleep(Duration(seconds: 3));
+    }
+    return null;
   }
 }
