@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import '../model/CartItem.dart';
-import '../service/Validator.dart';
+import '../util/Validator.dart';
 import '../manager/ThogaKadeManager.dart';
 import '../manager/InventoryManager.dart';
 import '../manager/OrderManager.dart';
