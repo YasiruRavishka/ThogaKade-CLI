@@ -96,27 +96,25 @@ class AppRepository {
   }
 
   void placedOrder(Order order) {
+    db.execute('BEGIN TRANSACTION');
     try {
-      final stmt = db.prepare(
-          'INSERT INTO orders (id, total, timestamp) VALUES (?, ?, ?)');
-      stmt.execute([
-        order.id,
-        order.total,
-        order.timestamp.toIso8601String()
-      ]);
-      stmt.dispose();
+      db.execute('INSERT INTO orders (id, total, timestamp) VALUES (?, ?, ?)',
+          [order.id, order.total, order.timestamp.toIso8601String()]);
       for (final item in order.items) {
-        final stmt2 = db.prepare('INSERT INTO order_items (order_id, inventory_id, qty) VALUES (?, ?, ?)');
-        final resultSet = db.select('SELECT seq FROM sqlite_sequence WHERE name = "orders"');
-        stmt2.execute([resultSet.first['seq'] as int, item.itemId, item.itemQty]);
-        stmt2.dispose();
-        final stmt3 = db.prepare('UPDATE inventory SET quantity = quantity - ? WHERE id = ?');
-        stmt3.execute([item.itemQty, item.itemId]);
-        stmt3.dispose();
+        db.execute(
+            'INSERT INTO order_items (order_id, inventory_id, qty) VALUES (?, ?, ?)',
+            [
+              db.select('SELECT seq FROM sqlite_sequence WHERE name = ?', ['orders']).first['seq'] as int,
+              item.itemId,
+              item.itemQty
+            ]);
+        db.execute('UPDATE inventory SET quantity = quantity - ? WHERE id = ?', [item.itemQty, item.itemId]);
       }
+      db.execute('COMMIT');
       clearCart();
       print('Order placed successfully.');
     } catch (e) {
+      db.execute('ROLLBACK;');
       print('Error saving inventory: $e');
     }
   }
