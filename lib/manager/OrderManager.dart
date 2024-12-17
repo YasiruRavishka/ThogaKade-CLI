@@ -16,6 +16,16 @@ class OrderManager {
     return false;
   }
 
+  bool clearCart() {
+    try {
+      AppRepository().clearCart();
+      return true;
+    } catch (e) {
+      print("Error!, clearCart()");
+    }
+    return false;
+  }
+
   List<CartItem>? getAllCart() {
     return AppRepository().getCart();
   }

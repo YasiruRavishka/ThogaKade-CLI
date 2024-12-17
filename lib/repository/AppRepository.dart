@@ -92,7 +92,6 @@ class AppRepository {
 
   void clearCart() {
     __cart = [];
-    print("Cart cleared!");
   }
 
   void placedOrder(Order order) {

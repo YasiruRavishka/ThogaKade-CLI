@@ -95,7 +95,9 @@ class CommandHandler {
           case 2:
             stdout.write("Do you want to clear this cart(y/n) : ");
             if(stdin.readLineSync()!.toLowerCase() == 'y') {
-
+              if (OrderManager().clearCart()) {
+                print("Cart cleared!");
+              }
             }
             break;
           case 3:
